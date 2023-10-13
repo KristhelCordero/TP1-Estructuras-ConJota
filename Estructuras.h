@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <ctime>
+
 using namespace std;
 
 //LISTA BASE
@@ -267,6 +268,7 @@ struct ListaRobots{
 
     void insertarFinal (string _codigoRobot, string _articuloFabrica, bool _apagado, bool _esPrioridad);
     void leerArchivoRobots();
+    Robot * asignarPedidoRobot(string _Codigo);
     void imprimir();
 
 };
@@ -413,7 +415,11 @@ struct RobotFabricador{
 // operar desde el thread la lista de robots
 // hacer una función que opere al robot correspondiente
 // Necesito: ver donde putas meto las validaciones :)
-    void elaborarProducto(Producto * productoAElaborar);
+    thread thread;
+    atomic<bool> apagado; 
+    atomic<bool> terminar;
+    bool procesado=false;
+    void elaborarProducto(Producto * productoAElaborar, int _cantidadProductos, int _cantidadSeg);
 };
 
 // EMPACADOR ------------------------------------------------------------------------------------------

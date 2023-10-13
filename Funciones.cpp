@@ -688,6 +688,21 @@ void ListaRobots::leerArchivoRobots(){
 	}
 }
 
+Robot * ListaRobots::asignarPedidoRobot(string _CodigoProducto){
+	string tipoProducto = string(1,_CodigoProducto.at(0));
+
+	Robot * tmp =primerRobot;
+	bool flag=true;
+	do
+	{
+		if((tmp->articuloFabrica==tipoProducto)&&(!tmp->apagado&&tmp->disponible)){
+			return tmp;
+			flag=false;
+		}		
+	} while (flag);
+	return NULL;
+}
+
 //BITACORA DE MOVIMIENTOS -----------------------------------------------------------------------------------
 
 // THREAD PEDIDOS -------------------------------------------------------------------------------------------
@@ -763,13 +778,25 @@ void ThreadBalanceador::procesarPedidos(){
 			}else{
 				//hay que mandar a elaborar un producto
 				//hay que hacer los robots por eso no he hecho esta parte XD
+				elaborarProducto(productoAElaborar);
 			}
 		}while (procesando);
 	}
 }
 
 //THREAD ROBOTS ---------------------------------------------------------------------------------------------
-void RobotFabricador::elaborarProducto(Producto * productoAElaborar){
+void RobotFabricador::elaborarProducto(Producto* productoAElaborar, int _cantidadProductos, int _cantidadSeg){
+	Robot* robotAsignado=asignarPedidoRobot(productoAElaborar->codigoProducto);
+	thread hilo;
+	
+	while(!terminar){
+		while(apagado){
+			hilo::sleep_for(chrono::milliseconds(2000));
+		}while(productoAElaborar->cantidad<_cantidadProductos){
+			hilo::sleep_for(chrono::seconds(_cantidadSeg));
+			productoAElaborar->cantidad++;
+		}
+	}
 	//Todavía no sé muy bien como va a funcionar esto
 }
 
@@ -860,15 +887,4 @@ string facturarPedido(NodoPedido *pedido, string _nombreArchivo){
 		}
 		archivo.close();
 	}
-}
-
-
-
-
-
-
-
-
-
-
-
+}  
